@@ -4,7 +4,7 @@
 
 ### Hardware
 
-This script will need two USB cameras to capture images and then apply necessary correction for lens distortion and geometry. Change the parameter value of ```cv.VideoCapture(0)``` if you don't see the proper streams.
+This script will need two USB cameras to capture images and then apply necessary correction for lens distortion and geometry. Change the parameter values of ```--left_camera_id``` and ```--right_camera_id``` if you don't see the proper streams.
 
 ### Calibration
 To obtain the camera matrix and the distortion coefficients you can use the calibrate.py script which comes with OpenCV (in the 'samples' folder). The script is basically a wrapper around OpenCVs camera calibration functionality and takes several snapshots from the calibration object as an input. After having run the script by issuing the following command in a shell :
@@ -26,6 +26,14 @@ Use the camera matrix value for K and the distortion coefficients for d. Do this
 
 ## Usage
 
-Run the script, press the Space bar to capture the images or use Esc to exit. The final image (with the two pictures side by side) will be generated in the same folder as the script.
+Run the script (use the parameters below if needed), press the Space bar to capture the images or use Esc to exit.
+```
+usage:
+    Podonator.py [--left_camera_id] [--right_camera_id] [<output path>]
 
+default values:
+    --left_camera_id  : 0
+    --right_camera_id : 1
+    <output path>     : .
+```
 Credits to https://hackaday.io/hacker/13659-hanno
