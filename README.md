@@ -36,4 +36,7 @@ default values:
     --right_camera_id : 1
     <output path>     : .
 ```
+
+When running the script with GUI the output path is only set inside the GUI (default is current folder).
+
 Credits to https://hackaday.io/hacker/13659-hanno
