@@ -2,6 +2,11 @@ import numpy as np
 import cv2 as cv
 import datetime
 import sys
+import getopt
+from pathlib import Path
+import os
+import webbrowser
+
 
 '''
 usage:
@@ -15,7 +20,7 @@ default values:
 
 # Change values below for image modification if necessary
 mirror = False
-rotationCW = False
+rotationCW = True
 
 # Use the calibration.py script to define the values below for each camera
 # Define camera matrix K for camera 1
@@ -26,12 +31,12 @@ K1 = np.array([[673.9683892, 0., 343.68638231],
 # Define distortion coefficients d for camera 1
 d1 = np.array([5.44787247e-02, 1.23043244e-01, -4.52559581e-04, 5.47011732e-03, -6.83110234e-01])
 
-# Define camera matrix K for camera 1
+# Define camera matrix K for camera 2
 K2 = np.array([[673.9683892, 0., 343.68638231],
                   [0., 676.08466459, 245.31865398],
                   [0., 0., 1.]])
 
-# Define distortion coefficients d for camera 1
+# Define distortion coefficients d for camera 2
 d2 = np.array([5.44787247e-02, 1.23043244e-01, -4.52559581e-04, 5.47011732e-03, -6.83110234e-01])
 
 
@@ -52,10 +57,10 @@ def get_camera_image(mirror, rotationCW, cam):
 def show_images(cam1, cam2):
     toggle = True
     while toggle:
-        img1 = get_camera_image(False, False, cam1)
-        img2 = get_camera_image(False, False, cam2)
+        img1 = get_camera_image(mirror, rotationCW, cam1)
+        img2 = get_camera_image(mirror, rotationCW, cam2)
         #Concatenate the two streams in a single image
-        cv.imshow(np.concatenate((img1, img2), axis=1))
+        cv.imshow("Podoscope", np.concatenate((img1, img2), axis=1))
         keypress = cv.waitKey(1)
         if keypress%256 == 27:
             #ESC pressed
@@ -86,10 +91,9 @@ def unwrap_image(img, K, d):
     return newimg
 
 def main():
-    import getopt
-    from pathlib import Path
-    import os
 
+    #Defines image format
+    file_ext=".jpg"
     args, output_dir = getopt.getopt(sys.argv[1:], '', ['left_camera_id=', 'right_camera_id='])
     args = dict(args)
     args.setdefault('--left_camera_id', 0)
@@ -111,7 +115,10 @@ def main():
     final_img = np.concatenate((correct_img1, correct_img2), axis=1)
     now=datetime.datetime.now()
     img_name=now.strftime("%Y-%m-%d-%H%M%S")
-    cv.imwrite(img_name, final_img)
+    cv.imwrite(img_name+file_ext, final_img)
+    #Opens the file browser in the output folder
+    webbrowser.open(str(Path(output_dir)))
+    return
 
 if __name__ == '__main__':
     main()
