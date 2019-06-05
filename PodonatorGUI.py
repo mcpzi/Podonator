@@ -43,24 +43,24 @@ class PodonatorGUI(BaseWidget):
 
         # Change values below for image modification if necessary
         self.mirror = False
-        self.rotationCW = True
+        self.rotationCW = False
 
         # Use the calibration.py script to define the values below for each camera
         # Define camera matrix K for camera 1
-        self.K1 = np.array([[673.9683892, 0., 343.68638231],
-                          [0., 676.08466459, 245.31865398],
-                          [0., 0., 1.]])
+        self.K1 = np.array( [[5.97379985e+03, 0., 9.45550548e+02],
+                        [0., 5.25358173e+03, 6.25005182e+02],
+                        [0., 0., 1.]])
 
         # Define distortion coefficients d for camera 1
-        self.d1 = np.array([5.44787247e-02, 1.23043244e-01, -4.52559581e-04, 5.47011732e-03, -6.83110234e-01])
+        self.d1 = np.array([-1.45301385e+01, 3.94029228e+02, 2.70782551e-01, -1.05196877e-01, -1.19783596e+03])
 
-        # Define camera matrix K for camera 1
-        self.K2 = np.array([[673.9683892, 0., 343.68638231],
-                          [0., 676.08466459, 245.31865398],
-                          [0., 0., 1.]])
+        # Define camera matrix K for camera 2
+        self.K2 = np.array( [[5.97379985e+03, 0., 9.45550548e+02],
+                        [0., 5.25358173e+03, 6.25005182e+02],
+                        [0., 0., 1.]])
 
-        # Define distortion coefficients d for camera 1
-        self.d2 = np.array([5.44787247e-02, 1.23043244e-01, -4.52559581e-04, 5.47011732e-03, -6.83110234e-01])
+        # Define distortion coefficients d for camera 2
+        self.d2 = np.array([-1.45301385e+01, 3.94029228e+02, 2.70782551e-01, -1.05196877e-01, -1.19783596e+03])
         return
 
     # Gets an image stream from a camera and apply mirroring or 90 degrees CW rotation if necessary
@@ -87,8 +87,11 @@ class PodonatorGUI(BaseWidget):
             img2 = self.get_camera_image(self.mirror, self.rotationCW, cam2)
             if self.flag:
                 return
+            img = np.concatenate((img1, img2), axis=1)
+            dim = (1280,480)
+            img = cv.resize(img, dim, interpolation = cv.INTER_AREA)
             #Concatenate the two streams in a single image
-            cv.imshow(np.concatenate((img1, img2), axis=1))
+            cv.imshow("Podoscope", img)
             keypress = cv.waitKey(1)
             if keypress%256 == 27:
                 #ESC pressed
@@ -117,6 +120,10 @@ class PodonatorGUI(BaseWidget):
 
         # Remap the original image to a new image
         newimg = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
+
+        #Crop and save
+        x, y, w, h = roi
+        newimg = newimg[y:y+h, x:x+w]
         return newimg
 
     def podonator(self,output_dir):
@@ -131,6 +138,10 @@ class PodonatorGUI(BaseWidget):
         right_camera_id = int(args.get('--right_camera_id'))
         cam1 = cv.VideoCapture(left_camera_id)
         cam2 = cv.VideoCapture(right_camera_id)
+        cam1.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+        cam1.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+        cam2.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+        cam2.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
         try:
             raw_img1, raw_img2 = self.show_images(cam1, cam2)
         except TypeError:
@@ -143,6 +154,9 @@ class PodonatorGUI(BaseWidget):
         now=datetime.datetime.now()
         img_name=now.strftime("%Y-%m-%d-%H%M%S")
         cv.imwrite(img_name+file_ext, final_img)
+        cv.imwrite(img_name+"_G"+file_ext, correct_img1)
+        cv.imwrite(img_name+"_D"+file_ext, correct_img2)
+        #Opens the file browser in the output folder
         webbrowser.open(str(Path(output_dir)))
         return
 
