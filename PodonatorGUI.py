@@ -43,7 +43,7 @@ class PodonatorGUI(BaseWidget):
 
         # Change values below for image modification if necessary
         self.mirror = False
-        self.rotationCW = False
+        self.rotationCW = True
 
         # Use the calibration.py script to define the values below for each camera
         # Define camera matrix K for camera 1
@@ -87,10 +87,11 @@ class PodonatorGUI(BaseWidget):
             img2 = self.get_camera_image(self.mirror, self.rotationCW, cam2)
             if self.flag:
                 return
+            #Concatenate the two streams in a single image side by side
             img = np.concatenate((img1, img2), axis=1)
-            dim = (1280,480)
+            #Image resolution to display
+            dim = (1080,960)
             img = cv.resize(img, dim, interpolation = cv.INTER_AREA)
-            #Concatenate the two streams in a single image
             cv.imshow("Podoscope", img)
             keypress = cv.waitKey(1)
             if keypress%256 == 27:

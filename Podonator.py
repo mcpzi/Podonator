@@ -20,7 +20,7 @@ default values:
 
 # Change values below for image modification if necessary
 mirror = False
-rotationCW = False
+rotationCW = True
 
 # Use the calibration.py script to define the values below for each camera
 # Define camera matrix K for camera 1
@@ -59,10 +59,11 @@ def show_images(cam1, cam2):
     while toggle:
         img1 = get_camera_image(mirror, rotationCW, cam1)
         img2 = get_camera_image(mirror, rotationCW, cam2)
-        img = np.concatenate((img1, img2), axis=1)
-        dim = (1280,480)
-        img = cv.resize(img, dim, interpolation = cv.INTER_AREA)
         #Concatenate the two streams in a single image
+        img = np.concatenate((img1, img2), axis=1)
+        #Image resolution to display
+        dim = (1080,960)
+        img = cv.resize(img, dim, interpolation = cv.INTER_AREA)
         cv.imshow("Podoscope", img)
         keypress = cv.waitKey(1)
         if keypress%256 == 27:
