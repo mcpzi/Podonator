@@ -7,17 +7,6 @@ from pathlib import Path
 import os
 import webbrowser
 
-
-'''
-usage:
-    Podonator.py [--left_camera_id] [--right_camera_id] [<output path>]
-
-default values:
-    --left_camera_id  : 0
-    --right_camera_id : 1
-    <output path>     : .
-'''
-
 # Change values below for image modification if necessary
 mirror = False
 rotationCW = False
@@ -59,12 +48,14 @@ def show_images(cam1, cam2):
     while toggle:
         img1 = get_camera_image(mirror, rotationCW, cam1)
         img2 = get_camera_image(mirror, rotationCW, cam2)
-        #Concatenate the two streams in a single image
-        #img = np.concatenate((img1, img2), axis=1)
-        img = np.concatenate((img1, img2), axis=0)
-        #Image resolution to display
-        #dim = (1080,960)
-        dim = (960,1080)
+        if rotationCW:
+            #Concatenate the two streams in a single image
+            img = np.concatenate((img1, img2), axis=1)
+            #Image resolution to display
+            dim = (1080,960)
+        else:
+            img = np.concatenate((img1, img2), axis=0)
+            dim = (960,1080)
         img = cv.resize(img, dim, interpolation = cv.INTER_AREA)
         cv.imshow("Podoscope Preview - Spacebar to acquire or Esc to cancel", img)
         keypress = cv.waitKey(1)
@@ -85,21 +76,19 @@ def show_images(cam1, cam2):
 def unwrap_image(img, K, d):
     # Read the image and get its size
     h, w = img.shape[:2]
-
     # Generate new camera matrix from parameters
     newcameramatrix, roi = cv.getOptimalNewCameraMatrix(K, d, (w,h), 1, (w,h))
-
     # Generate look-up tables for remapping the camera image
     mapx, mapy = cv.initUndistortRectifyMap(K, d, None, newcameramatrix, (w, h), 5)
-
     # Remap the original image to a new image
     newimg = cv.remap(img, mapx, mapy, cv.INTER_LINEAR)
-
     #Crop and save
     x, y, w, h = roi
     newimg = newimg[y:y+h, x:x+w]
     return newimg
 
+# Test if the camera is connected
+# Returns False if not, True otherwise
 def test_camera(camera_id):
     cam = cv.VideoCapture(camera_id)
     ret_val, image = cam.read()
@@ -109,7 +98,6 @@ def test_camera(camera_id):
     return True
 
 def podonator(output_dir, left_camera_id, right_camera_id):
-
     #Defines image format
     file_ext=".jpg"
     os.chdir(str(Path(output_dir)))
@@ -119,11 +107,12 @@ def podonator(output_dir, left_camera_id, right_camera_id):
     cam1.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     cam2.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
     cam2.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
+    #Launch image preview and capture
     raw_img1, raw_img2 = show_images(cam1, cam2)
+    #Undistort
     correct_img1 = unwrap_image(raw_img1, K1, d1)
     correct_img2 = unwrap_image(raw_img2, K2, d2)
-    #correct_img1 = raw_img1
-    #correct_img2 = raw_img2
+    #Concatenate and write the final images
     final_img = np.concatenate((correct_img1, correct_img2), axis=1)
     now=datetime.datetime.now()
     img_name=now.strftime("%Y-%m-%d-%H%M%S")

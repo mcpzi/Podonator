@@ -5,7 +5,6 @@ import sys
 import getopt
 from pathlib import Path
 import PodonatorLib
-import cv2 as cv
 
 '''
 usage:
