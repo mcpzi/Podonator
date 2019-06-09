@@ -14,7 +14,7 @@ Run the calibration script by issuing the following command in a shell :
 python calibrate.py "calibration_pictures/image_*.jpg"
 ```
 
-It will output the calibration parameters for our camera, namely the root-mean-square error (RMS) of our parameter estimation, the camera matrix and the distortion coefficients can be obtained:
+It will output the calibration parameters for our camera, namely the root-mean-square error (RMS) of our parameter estimation, the camera matrix and the distortion coefficients:
 ```
 RMS: 0.171988082483
 camera matrix:
