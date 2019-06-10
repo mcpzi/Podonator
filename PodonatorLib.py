@@ -10,7 +10,7 @@ from PIL import Image
 
 # Change values below for image modification if necessary
 mirror = False
-rotationCW = False
+rotate = True
 
 # Use the calibration.py script to define the values below for each camera
 # Define camera matrix K for camera 1
@@ -28,26 +28,24 @@ d2 = np.array([[-0.008902607891725171], [0.09267206754490831], [-0.1573647120269
 
 # Gets an image stream from a camera and apply mirroring or 90 degrees CW rotation if necessary
 # Returns the stream with applied corrections
-def get_camera_image(mirror, rotationCW, cam):
+def get_camera_image(mirror, cam):
     ret_val, img = cam.read()
     if not ret_val:
         sys.exit("ERROR : One or more cameras unavailable")
     if mirror:
         img = cv.flip(img, 1)
-    if rotationCW:
-        img=cv.rotate(img, cv.ROTATE_90_CLOCKWISE)
     return img
 
 # Shows the stream from the cameras and allows for image capture
 # Returns the two captured images (one per camera)
-def show_images(cam1, cam2):
+def show_images(cam1, cam2, rotation):
     toggle = True
     while toggle:
-        img1 = get_camera_image(mirror, rotationCW, cam1)
-        img2 = get_camera_image(mirror, rotationCW, cam2)
-        if rotationCW:
+        img1 = get_camera_image(mirror, cam1)
+        img2 = get_camera_image(mirror, cam2)
+        if rotate == True:
             #Concatenate the two streams in a single image
-            img = np.concatenate((img1, img2), axis=1)
+            img = np.concatenate((cv.rotate(img, cv.ROTATE_90_CLOCKWISE), cv.rotate(img, cv.ROTATE_90_COUNTERCLOCKWISE)), axis=1)
             #Image resolution to display
             dim = (1080,960)
         else:
@@ -117,6 +115,9 @@ def podonator(output_dir, left_camera_id, right_camera_id):
     #Undistort and correct perspective
     correct_img1 = unwrap_image(raw_img1, K1, d1)
     correct_img2 = unwrap_image(raw_img2, K2, d2)
+    if rotate == True:
+        correct_img1 = cv.rotate(correct_img1, cv.ROTATE_90_CLOCKWISE)
+        correct_img2 = cv.rotate(correct_img2, cv.ROTATE_90_COUNTERCLOCKWISE)
     now=datetime.datetime.now()
     img_name=now.strftime("%Y-%m-%d-%H%M%S")
     cv.imwrite(img_name+"_G"+file_ext, correct_img1)
