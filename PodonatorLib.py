@@ -72,7 +72,7 @@ def unwrap_image(img, K, d):
     # Read the image and get its size
     h, w = img.shape[:2]
     # Generate look-up tables for remapping the camera image
-    mapx, mapy = cv.fisheye.initUndistortRectifyMap(K, d, np.eye(3), K, (w, h)), cv.CV_16SC2)
+    mapx, mapy = cv.fisheye.initUndistortRectifyMap(K, d, np.eye(3), K, (w, h), cv.CV_16SC2)
     # Remap the original image to a new image
     newimg = cv2.remap(img, mapx, mapy, interpolation=cv.INTER_LINEAR, borderMode=cv.BORDER_CONSTANT)
     #Adding padding to left and right to compensate perspective
