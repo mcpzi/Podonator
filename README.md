@@ -1,4 +1,4 @@
-# CameraPodo
+# Podonator
 
 ## Setup
 
@@ -7,7 +7,10 @@
 This script will need two USB cameras to capture images and then apply necessary correction for lens distortion and geometry. Change the parameter values of ```--left_camera_id``` and ```--right_camera_id``` if you don't see the proper streams.
 
 ### Calibration
-To obtain the camera matrix and the distortion coefficients you can use the calibrate.py script which comes with OpenCV (in the 'samples' folder). The script is basically a wrapper around OpenCVs camera calibration functionality and takes several snapshots from the calibration object as an input. Take pictures (at least 6) with the target in several different positions with each camera and then rename them to match a sequence pattern. Use the pictures to determine if you need to use the mirroring or rotation parameters and, if you do so, apply the transformation to the pictures before running the calibration script and change the parameter value in PodonatorLib.py.
+To obtain the camera matrix and the distortion coefficients you can use the calibrate.py script which comes with OpenCV (in the 'samples' folder). The script is basically a wrapper around OpenCVs camera calibration functionality and takes several snapshots from the calibration object as an input. Take pictures (at least 6) with the target in several different positions and orientations (not always coplanar with the camera) with each camera. Follow the procedure below to determine the values of the matrix and distortion values of each camera then edit the PodonatorLib script to apply them (use the camera matrix value for the value of K and the distortion coefficients for d). Do this for __each__ camera !
+
+#### For normal lenses
+Rename the calibration pictures to match a sequence pattern. Use the pictures to determine if you need to use the mirroring parameter and, if you do so, apply the transformation to the pictures before running the calibration script and change the parameter value in PodonatorLib.py.
 
 Run the calibration script by issuing the following command in a shell :
 ```
@@ -24,7 +27,12 @@ camera matrix:
 distortion coefficients:  [-0.36824145  0.2848545   0.00079123  0.00064924 -0.16345661]
 ```
 
-Edit the PodonatorLib script to change the matrix and distortion values (use the camera matrix value for K and the distortion coefficients for d). Do this for __each__ camera !
+#### For fisheye lenses
+Copy the ```fisheyeCalibration.py``` script to the folder containing the calibration pictures. This folder should __only__ contain the calibration script and the calibration pictures. Then, run the calibration script by issuing the following command in a shell :
+```
+python fisheyeCalibration.py
+```
+The script will only read PNG images by default, if you're using jpeg then change the parameter value in line 20.
 
 ## Usage
 Run the script (use the parameters below if needed), press the Space bar to capture the images or use Esc to exit.
