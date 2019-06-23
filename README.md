@@ -1,5 +1,7 @@
 # Podonator
 
+Podonator is a small tool for DIY Orthotics scanners based on two (FullHD) webcams. It will handle camera calibration and image correction to output at-scale and print-ready images. It's fully open-source and based on OpenCV.
+
 ## Setup
 
 ### Hardware
@@ -32,15 +34,15 @@ Copy the ```fisheyeCalibration.py``` script to the folder containing the calibra
 ```
 python fisheyeCalibration.py
 ```
-The script will only read PNG images by default, if you're using jpeg then change the parameter value in line 20.
+It will output the values for K and d, just copy and paste those values in ```PodonatorLib.py```. Note : The script will only read PNG images by default, if you're using jpeg then change the parameter value in line 20.
 
 ## Usage
-Run the script (use the parameters below if needed), press the Space bar to capture the images or use Esc to exit.
+Run the script (use the parameters below if needed), press the Space bar to capture the images or press Esc to exit.
 ```
 usage:
     Podonator.py [--left_camera_id] [--right_camera_id] [<output path>]
     or
-    PodonatorGUI.py [--left_camera_id] [--right_camera_id]
+    PodonatorGUI.py
 
 default values:
     --left_camera_id  : 0
@@ -48,6 +50,6 @@ default values:
     <output path>     : .
 ```
 
-When running the GUI version of the script the output path is only set inside the GUI (default is current folder).
+When running ```PodonatorGUI.py``` the output path and camera IDs are set inside the GUI. Rename to ```PodonatorGUI.pyw``` to get rid of the console window (but you won't see any console output).
 
-Credits to https://hackaday.io/hacker/13659-hanno
+Credits to https://hackaday.io/hacker/13659-hanno for initial idea and OpenCV tutorials for fisheye lens distortion correction
