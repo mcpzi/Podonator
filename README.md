@@ -5,8 +5,11 @@ Podonator is a small tool for DIY Orthotics scanners based on two (FullHD) webca
 ## Setup
 
 ### Hardware
-
 This script will need two USB cameras to capture images and then apply necessary correction for lens distortion and geometry. Change the parameter values of ```--left_camera_id``` and ```--right_camera_id``` if you don't see the proper streams.
+
+### Software
+Make sure both Python3 (>=3.7) and OpenCV (>=3.4) are installed.
+
 
 ### Calibration
 To obtain the camera matrix and the distortion coefficients you can use the calibrate.py script which comes with OpenCV (in the 'samples' folder). The script is basically a wrapper around OpenCVs camera calibration functionality and takes several snapshots from the calibration object as an input. Take pictures (at least 6) with the target in several different positions and orientations (not always coplanar with the camera) with each camera. Follow the procedure below to determine the values of the matrix and distortion values of each camera then edit the PodonatorLib script to apply them (use the camera matrix value for the value of K and the distortion coefficients for d). Do this for __each__ camera !
@@ -35,6 +38,15 @@ Copy the ```fisheyeCalibration.py``` script to the folder containing the calibra
 python fisheyeCalibration.py
 ```
 It will output the values for K and d, just copy and paste those values in ```PodonatorLib.py```. Note : The script will only read PNG images by default, if you're using jpeg then change the parameter value in line 20.
+
+### Perspective correction
+Perspective correction will be necessary if the cameras are tilted. Follow the procedure below to determine and apply the correction :
+1. Cut a rectangle out of a cardboard, its length and width should cover all feet sizes
+2. Place the cardboard on the orthotics scanner so that it is visible by camera 1
+3. Capture the image from the corresponding camera with a regular image capture tool (do not apply any image correction)
+4. Open the image and get the coordinates of each corner of the rectangle (use XnView or Paint.NET for example)
+5. Change the values in ```PodonatorLib.py``` : reference_cam1 = np.float32([[x1, y1],[x2, y2],[x3, y3],[x4, y4]]) where x1, y1 are the coordinates of the top left corner, x2, y2 the top right corner, x3, y3 the bottom left corner and x4, y4 the bottom right corner
+6. Repeat the procedure for camera 2 and change the values of reference_cam2
 
 ## Usage
 Run the script (use the parameters below if needed), press the Space bar to capture the images or press Esc to exit.
