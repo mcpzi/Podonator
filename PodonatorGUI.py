@@ -1,63 +1,73 @@
-from pyforms.basewidget import BaseWidget
-from pyforms.controls   import ControlDir
-from pyforms.controls   import ControlButton
-from pyforms.controls   import ControlNumber
 import sys
-import getopt
 from pathlib import Path
+from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QSpinBox,\
+    QPushButton, QGridLayout, QApplication, QFileDialog, QErrorMessage)
+from PyQt5 import QtCore
+from PyQt5 import QtGui
 import PodonatorLib
 
-'''
-usage:
-    PodonatorGUI.py
-'''
-
-class PodonatorGUI(BaseWidget):
-    def __init__(self, *args, **kwargs):
-
-        super().__init__('Podonator v1.0')
+class podonatorWidget(QWidget):
+    def __init__(self):
+        super().__init__()
         self.test_camera_flag = False
-        #Definition of the forms fields
-        self._outputfolder  = ControlDir('Répertoire de sortie', default=str(Path().absolute()))
-        self._outputfolder.value = str(Path().absolute())
-        self._runbutton  = ControlButton('Acquisition')
-        self._cameraleft = ControlNumber("ID caméra gauche", default=0, decimals=0)
-        self._cameraright = ControlNumber("ID caméra droite", default=1, decimals=0)
+        pathEditLabel = QLabel("Path")
+        pathEditLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.outputFolder = str(Path().absolute())
+        self.pathEdit = QLineEdit(self.outputFolder)
+        pathEditButton = QPushButton("Browse...")
+        camLIDLabel = QLabel("Left Camera ID")
+        self.camLID = QSpinBox(self)
+        self.camLID.setValue(0)
+        camLIDLabel.setAlignment(QtCore.Qt.AlignCenter)
+        camRIDLabel = QLabel("Right Camera ID")
+        self.camRID = QSpinBox(self)
+        self.camRID.setValue(1)
+        camRIDLabel.setAlignment(QtCore.Qt.AlignCenter)
+        acquireButton = QPushButton("Acquire")
+        layout = QGridLayout()
+        layout.setSpacing(10)
+        layout.addWidget(pathEditLabel, 1, 0)
+        layout.addWidget(self.pathEdit, 1, 1, 1, 2)
+        layout.addWidget(pathEditButton, 1, 3)
+        layout.addWidget(camLIDLabel, 2, 0)
+        layout.addWidget(self.camLID, 2, 1)
+        layout.addWidget(camRIDLabel, 2, 2)
+        layout.addWidget(self.camRID, 2, 3)
+        layout.addWidget(acquireButton, 3, 0, 1, 4)
+        self.setLayout(layout)
+        acquireButton.clicked.connect(self.acquireAction)
+        pathEditButton.clicked.connect(self.browseAction)
+        self.critical = QErrorMessage()
+        self.critical.setWindowTitle("Error")
 
-        #Define the event that will be called when the run button is processed
-        self._runbutton.value = self.run_event
-        self._outputfolder.changed_event = self.__outputFolderSelectionEvent
-        #Define the organization of the Form Controls
-        self._formset = [
-            ('','_outputfolder',''),
-            ('','_cameraleft','','_cameraright',''),
-            ('','_runbutton','')
-        ]
-
-        return
-
-    def __outputFolderSelectionEvent(self):
-        outputFolder=self._outputfolder.value
-
-    def run_event(self):
-        #args, optlist = getopt.getopt(sys.argv[1:], '', ['left_camera_id=', 'right_camera_id='])
-        #args = dict(args)
-        #args.setdefault('--left_camera_id', 0)
-        #args.setdefault('--right_camera_id', 1)
-        #left_camera_id = int(args.get('--left_camera_id'))
-        #right_camera_id = int(args.get('--right_camera_id'))
-        if self.test_camera_flag == False:
-            if not PodonatorLib.test_camera(int(self._cameraleft.value)):
-                self.critical("ERROR: No input from left camera, check camera ID", title="Error")
-            if not PodonatorLib.test_camera(int(self._cameraright.value)):
-                self.critical("ERROR: No input from right camera, check camera ID", title="Error")
-            if PodonatorLib.test_camera(int(self._cameraleft.value)) and PodonatorLib.test_camera(int(self._cameraright.value)):
+    def acquireAction(self):
+        if not self.test_camera_flag:
+            if not PodonatorLib.test_camera(int(self.camLID.text())):
+                self.critical.showMessage("ERROR: No input from left camera, check camera ID")
+                self.critical.exec_()
+            if not PodonatorLib.test_camera(int(self.camRID.text())):
+                self.critical.showMessage("ERROR: No input from right camera, check camera ID")
+                self.critical.exec_()
+            if PodonatorLib.test_camera(int(self.camLID.text())) and PodonatorLib.test_camera(int(self.camRID.text())):
                 self.test_camera_flag = True
-        if self.test_camera_flag == True:
-            PodonatorLib.podonator(self._outputfolder.value, int(self._cameraleft.value), int(self._cameraright.value))
+        if self.test_camera_flag:
+            self.outputFolder = str(Path(self.pathEdit.text()))
+            PodonatorLib.podonator(self.outputFolder, int(self.camLID.text()), int(self.camRID.text()))
         return
 
-if __name__ == '__main__':
+    def browseAction(self):
+        self.outputFolder = str(Path(QFileDialog.getExistingDirectory(self, "Output folder")))
+        self.pathEdit.setText(self.outputFolder)
 
-    from pyforms import start_app
-    start_app(PodonatorGUI, geometry=(100, 100, 400, 150))
+if __name__ == "__main__":
+    podonator = QApplication([])
+
+    podonatorGUI = podonatorWidget()
+    podonatorGUI.setWindowTitle("Podonator v1.0")
+    scriptDir = Path(__file__).parent
+    scriptDir = scriptDir.joinpath('950-512.png')
+    podonatorGUI.setWindowIcon(QtGui.QIcon(str(scriptDir)))
+    podonatorGUI.resize(500, 150)
+    podonatorGUI.show()
+
+    sys.exit(podonator.exec_())

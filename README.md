@@ -1,6 +1,6 @@
 # Podonator
 
-Podonator is a small tool for DIY Orthotics scanners based on two (FullHD) webcams. It will handle camera calibration and image correction to output at-scale and print-ready images. It's fully open-source and based on OpenCV.
+Podonator is a small tool for DIY Orthotics scanners based on two webcams. It will handle camera calibration and image correction to output at-scale and print-ready images. It's fully open-source and based on OpenCV.
 
 ## Setup
 
@@ -12,15 +12,8 @@ Use at least Python3 >=3.7 and install the following libraries using pip :
 ```
 pip install Pillow (6.2.1)
 pip install opencv-python (4.1.2.30)
-pip install Pyforms-GUI (4.904.152)
-pip install PyOpenGL_accelerate
+pip install PyQt5 (5.14.1)
 ```
-
-If using OpenCV > 3.4.5.20 then Pyforms won't install properly. Here's a workaround :
-1. Download the sources of Pyforms-GUI from https://github.com/UmSenhorQualquer/pyforms-gui
-2. Open ```setup.py``` and modify line 45 from ```'opencv-python==3.4.5.20',``` to ```'opencv-python>=3.4.5.20',```
-3. Run ```python setup.py build``` then ```python setup.py install``` (that last step may fail at some point but it doesn't matter here)
-4. Run ```pip install Pyforms-GUI``` again, it should complete successfully
 
 ### Calibration
 To obtain the camera matrix and the distortion coefficients you can use the calibrate.py script which comes with OpenCV (in the 'samples' folder). The script is basically a wrapper around OpenCVs camera calibration functionality and takes several snapshots from the calibration object as an input. Take pictures (at least 6) with the target in several different positions and orientations (not always coplanar with the camera) with each camera. Follow the procedure below to determine the values of the matrix and distortion values of each camera then edit the PodonatorLib script to apply them (use the camera matrix value for the value of K and the distortion coefficients for d). Do this for __each__ camera !
