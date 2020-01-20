@@ -15,6 +15,14 @@ pip install opencv-python (4.1.2.30)
 pip install PyQt5 (5.14.1)
 ```
 
+If you want to use Podonator as a standalone .exe please to do following :
+```
+pip install pyinstaller (3.6)
+pyinstaller .\PodonatorGUI.py --onefile --windowed --icon .\950-512.ico -n Podonator
+```
+If you want to keep the size of the .exe small (~70MB), make sure to use a specific Python VENV where only the above libraries are installed.
+
+
 ### Calibration
 To obtain the camera matrix and the distortion coefficients you can use the calibrate.py script which comes with OpenCV (in the 'samples' folder). The script is basically a wrapper around OpenCVs camera calibration functionality and takes several snapshots from the calibration object as an input. Take pictures (at least 6) with the target in several different positions and orientations (not always coplanar with the camera) with each camera. Follow the procedure below to determine the values of the matrix and distortion values of each camera then edit the PodonatorLib script to apply them (use the camera matrix value for the value of K and the distortion coefficients for d). Do this for __each__ camera !
 
@@ -53,6 +61,12 @@ Perspective correction will be necessary if the cameras are tilted. Follow the p
 6. Repeat the procedure for camera 2 and change the values of reference_cam2
 
 ## Usage
+
+### GUI Version
+
+Run ```PodonatorGUI.py``` the output path and camera IDs are set inside the GUI. Rename to ```PodonatorGUI.pyw``` to get rid of the console window (but you won't see any console output). Click on "Acquire" the press the Space bar to capture the images or press Esc to exit.
+
+### CLI
 Run the script (use the parameters below if needed), press the Space bar to capture the images or press Esc to exit.
 ```
 usage:
@@ -65,7 +79,5 @@ default values:
     --right_camera_id : 1
     <output path>     : .
 ```
-
-When running ```PodonatorGUI.py``` the output path and camera IDs are set inside the GUI. Rename to ```PodonatorGUI.pyw``` to get rid of the console window (but you won't see any console output).
 
 Credits to https://hackaday.io/hacker/13659-hanno for initial idea and OpenCV tutorials for fisheye lens distortion correction
