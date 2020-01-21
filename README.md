@@ -20,6 +20,9 @@ If you want to use Podonator as a standalone .exe please to do following :
 pip install pyinstaller (3.6)
 pyinstaller .\PodonatorGUI.py --onefile --windowed --icon .\950-512.ico -n Podonator
 ```
+To display the icon in the top left corner of the window, edit the .spec file and add 
+```a.datas += [('950-512.png','path_to_image\950-512.png', "DATA")]```
+
 If you want to keep the size of the .exe small (~70MB), make sure to use a specific Python VENV where only the above libraries are installed.
 
 

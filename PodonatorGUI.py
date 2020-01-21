@@ -61,12 +61,16 @@ class podonatorWidget(QWidget):
 
 if __name__ == "__main__":
     podonator = QApplication([])
-
     podonatorGUI = podonatorWidget()
     podonatorGUI.setWindowTitle("Podonator v1.0")
-    scriptDir = Path(__file__).parent
-    scriptDir = scriptDir.joinpath('950-512.png')
-    podonatorGUI.setWindowIcon(QtGui.QIcon(str(scriptDir)))
+    # Window icon management
+    try:
+        scriptDir = Path(sys._MEIPASS) # Running as packaged with PyInstaller # pylint: disable=W0212
+    except AttributeError:
+        scriptDir = Path(__file__).parent # Running with Python interpreter
+    iconFileName = scriptDir.joinpath("950-512.png")
+    podonatorGUI.setWindowIcon(QtGui.QIcon(str(iconFileName)))
+    # Window size
     podonatorGUI.resize(500, 150)
     podonatorGUI.show()
 
