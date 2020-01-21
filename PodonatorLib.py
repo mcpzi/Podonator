@@ -1,3 +1,4 @@
+""" Main Podonator library, contains all camera calibration and image correction functions"""
 import sys
 import datetime
 import os
@@ -37,6 +38,7 @@ reference_cam2 = np.float32([[290, 341], [1562, 317], [72, 943], [1834, 907]])
 # Test if the camera is connected
 # Returns False if not, True otherwise
 def test_camera(camera_id):
+    """Camera testing"""
     cam = cv.VideoCapture(camera_id)
     #ret_val, image = cam.read()
     #if not ret_val:
@@ -46,17 +48,17 @@ def test_camera(camera_id):
     cam.release()
     return True
 
-# Camera initialization
 def init_camera(camera_id):
+    """Camera initialization"""
     cam = cv.VideoCapture(camera_id, cv.CAP_DSHOW)
     cam.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
     cam.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     cam.set(cv.CAP_PROP_FPS, 5)
     return cam
 
-# Gets an image stream from a camera and apply mirroring or 90 degrees CW rotation if necessary
-# Returns the stream with applied corrections
 def get_camera_image(mirror_bool, cam):
+    """Gets an image stream from a camera and apply mirroring or 90 degrees CW rotation if necessary
+    Returns the stream with applied corrections"""
     ret_val, img = cam.read()
     if not ret_val:
         sys.exit("ERROR : One or more cameras unavailable")
@@ -64,9 +66,10 @@ def get_camera_image(mirror_bool, cam):
         img = cv.flip(img, 1)
     return img
 
-# Shows the stream from the cameras and allows for image capture
-# Returns the two captured images (one per camera)
+
 def show_images(cam1, cam2, rotate_bool):
+    """Shows the stream from the cameras and allows for image capture
+    Returns the two captured images (one per camera)"""
     toggle = True
     gen_output = False
     while toggle:
@@ -102,18 +105,19 @@ def show_images(cam1, cam2, rotate_bool):
             print("Images acquired")
     return up_img1, up_img2, gen_output
 
-# Applies correction for lens distortion (K and D parameters obtained through OpenCV calibration for each camera)
-# Returns the image with applied lens distortion correction
 def undistort_image(img, K, d):
+    """Applies correction for lens distortion (K and D parameters obtained through OpenCV calibration for each camera)
+    Returns the image with applied lens distortion correction"""
     # Read the image and get its size
     h, w = img.shape[:2]
     # Generate look-up tables for remapping the camera image
-    mapx, mapy = cv.fisheye.initUndistortRectifyMap(K, d, np.eye(3), K, (w, h), cv.CV_16SC2)
+    mapx, mapy = cv.fisheye.initUndistortRectifyMap(K, d, np.eye(3), K, (w, h), cv.CV_16SC2) # pylint: disable=no-member
     # Remap the original image to a new image
     newimg = cv.remap(img, mapx, mapy, interpolation=cv.INTER_LINEAR, borderMode=cv.BORDER_CONSTANT)
     return newimg
-#Perspective correction
+
 def perpective_correction(img, reference):
+    """Perspective correction"""
     h, w = img.shape[:2]
     target = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
     M = cv.getPerspectiveTransform(reference, target)
@@ -122,6 +126,7 @@ def perpective_correction(img, reference):
     return newimg
 
 def output_images(img1, img2, naming_pattern, file_extension, image_dpi_value):
+    """Image generation"""
     cv.imwrite(naming_pattern+"_G"+file_extension, img1)
     cv.imwrite(naming_pattern+"_D"+file_extension, img2)
     #Adjust image DPI for printing
@@ -132,6 +137,7 @@ def output_images(img1, img2, naming_pattern, file_extension, image_dpi_value):
     return
 
 def podonator(output_dir, left_camera_id, right_camera_id):
+    """Calls all previous functions"""
     os.chdir(str(Path(output_dir)))
     #Initialize cameras
     cam1 = init_camera(left_camera_id)

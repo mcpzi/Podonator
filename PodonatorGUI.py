@@ -1,3 +1,4 @@
+"""Podonator PyQT5 GUI"""
 import sys
 from pathlib import Path
 from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QSpinBox,\
@@ -7,6 +8,7 @@ from PyQt5 import QtGui
 import PodonatorLib
 
 class podonatorWidget(QWidget):
+    """Main window widget"""
     def __init__(self):
         super().__init__()
         self.test_camera_flag = False
@@ -41,6 +43,7 @@ class podonatorWidget(QWidget):
         self.critical.setWindowTitle("Error")
 
     def acquireAction(self):
+        """Action to run when the Acquire button is clicked"""
         if not self.test_camera_flag:
             if not PodonatorLib.test_camera(int(self.camLID.text())):
                 self.critical.showMessage("ERROR: No input from left camera, check camera ID")
@@ -56,6 +59,7 @@ class podonatorWidget(QWidget):
         return
 
     def browseAction(self):
+        """Directory browser to set the output path"""
         self.outputFolder = str(Path(QFileDialog.getExistingDirectory(self, "Output folder")))
         self.pathEdit.setText(self.outputFolder)
 
