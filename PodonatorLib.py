@@ -158,5 +158,4 @@ def podonator(output_dir, left_camera_id, right_camera_id):
         #Open the file browser in the output folder
         webbrowser.open(str(Path(output_dir)))
         return
-    else:
-        return
+    return
