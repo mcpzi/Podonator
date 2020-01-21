@@ -5,7 +5,7 @@ Podonator is a small tool for DIY Orthotics scanners based on two webcams. It wi
 ## Setup
 
 ### Hardware
-This script will need two USB cameras to capture images and then apply necessary correction for lens distortion and geometry. Change the parameter values of ```--left_camera_id``` and ```--right_camera_id``` if you don't see the proper streams.
+This script will need two USB cameras to capture images and then apply necessary correction for lens distortion and geometry. As the software uses OpenCV most USB cameras are compatible.
 
 ### Software
 Use at least Python3 >=3.7 and install the following libraries using pip : 
@@ -20,8 +20,10 @@ If you want to use Podonator as a standalone .exe please to do following :
 pip install pyinstaller (3.6)
 pyinstaller .\PodonatorGUI.py --onefile --windowed --icon .\950-512.ico -n Podonator
 ```
-To display the icon in the top left corner of the window, edit the .spec file and add 
-```a.datas += [('950-512.png','path_to_image\950-512.png', "DATA")]```
+To display the icon in the top left corner of the window, edit the .spec file and add :
+```
+a.datas += [('950-512.png','path_to_image\950-512.png', "DATA")]
+```
 
 If you want to keep the size of the .exe small (~70MB), make sure to use a specific Python VENV where only the above libraries are installed.
 
@@ -67,7 +69,7 @@ Perspective correction will be necessary if the cameras are tilted. Follow the p
 
 ### GUI Version
 
-Run ```PodonatorGUI.py``` the output path and camera IDs are set inside the GUI. Rename to ```PodonatorGUI.pyw``` to get rid of the console window (but you won't see any console output). Click on "Acquire" the press the Space bar to capture the images or press Esc to exit.
+Simply run ```PodonatorGUI.py```, the output path and camera IDs are to be set inside the GUI. Rename to ```PodonatorGUI.pyw``` to get rid of the console window (but you won't see any console output). Click on "Acquire" then press the Space bar to capture the images or press Esc to exit.
 
 ### CLI
 Run the script (use the parameters below if needed), press the Space bar to capture the images or press Esc to exit.
