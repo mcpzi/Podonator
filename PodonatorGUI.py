@@ -5,7 +5,7 @@ import os
 import webbrowser
 from pathlib import Path
 from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QSpinBox,\
-    QPushButton, QGridLayout, QApplication, QFileDialog, QErrorMessage,\
+    QPushButton, QGridLayout, QApplication, QFileDialog, QMessageBox,\
     QVBoxLayout)
 from PyQt5 import QtCore
 from PyQt5 import QtGui
@@ -46,17 +46,19 @@ class podonatorWidget(QWidget):
         self.setLayout(layout)
         previewButton.clicked.connect(self.previewAction)
         pathEditButton.clicked.connect(self.browseAction)
-        self.critical = QErrorMessage()
+        self.critical = QMessageBox()
+        self.critical.setIcon(QMessageBox.Critical)
         self.critical.setWindowTitle("Error")
+        self.critical.setWindowIcon(getIcon())
 
     def previewAction(self):
         """Action to run when the Preview button is clicked"""
         if not self.test_camera_flag:
             if not PodonatorLib.test_camera(int(self.camLID.text())):
-                self.critical.showMessage("ERROR: No input from left camera, check camera ID")
+                self.critical.setText("Invalid Camera ID\nNo input from left camera, check camera ID")
                 self.critical.exec_()
             if not PodonatorLib.test_camera(int(self.camRID.text())):
-                self.critical.showMessage("ERROR: No input from right camera, check camera ID")
+                self.critical.setText("Invalid Camera ID\nNo input from right camera, check camera ID")
                 self.critical.exec_()
             if PodonatorLib.test_camera(int(self.camLID.text())) and PodonatorLib.test_camera(int(self.camRID.text())):
                 self.test_camera_flag = True
@@ -88,6 +90,7 @@ class imagePreview(QWidget):
         self.setLayout(self.vlayout)
         self.acquireButton.clicked.connect(self.acquireAction)
         self.cancelButton.clicked.connect(self.cancelAction)
+        self.setWindowIcon(getIcon())
 
     def keyPressEvent(self, event):
         """For capturing Escape key press event (same action as cancel button)"""
@@ -109,7 +112,7 @@ class imagePreview(QWidget):
         self.toggle = False
 
 def show_images(cam1, cam2, rotate_bool):
-    """Shows the stream from the cameras and allows for image capture Returns the two captured images (one per camera)"""
+    """Shows the stream from the cameras (with full image correction) and allows for image capture returns the two captured images (one per camera)"""
 
     imageWindow = imagePreview()
     imageWindow.show()
@@ -172,18 +175,21 @@ def podorun(output_dir, left_camera_id, right_camera_id):
         webbrowser.open(str(Path(output_dir)))
         return
     return
-
-if __name__ == "__main__":
-    podonator = QApplication([])
-    podonatorGUI = podonatorWidget()
-    podonatorGUI.setWindowTitle("Podonator v1.0")
-    # Window icon management
+def getIcon():
+    """Window icon management"""
     try:
         scriptDir = Path(sys._MEIPASS) # Running as packaged with PyInstaller # pylint: disable=W0212
     except AttributeError:
         scriptDir = Path(__file__).parent # Running with Python interpreter
     iconFileName = scriptDir.joinpath("950-512.png")
-    podonatorGUI.setWindowIcon(QtGui.QIcon(str(iconFileName)))
+    qtIcon = QtGui.QIcon(str(iconFileName))
+    return qtIcon
+
+if __name__ == "__main__":
+    podonator = QApplication([])
+    podonatorGUI = podonatorWidget()
+    podonatorGUI.setWindowTitle("Podonator v1.0")
+    podonatorGUI.setWindowIcon(getIcon())
     # Window size
     podonatorGUI.resize(500, 150)
     podonatorGUI.show()
