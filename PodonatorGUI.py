@@ -116,7 +116,8 @@ def show_images(cam1, cam2, rotate_bool):
 
     imageWindow = imagePreview()
     imageWindow.show()
-    imageWindow.setWindowTitle("Podonator preview")
+    imageWindow.setWindowTitle("Podonator Preview")
+    previewWindowLongSide = 960 # Number of pixels of the long side of the preview image
     while imageWindow.toggle:
         img1 = PodonatorLib.get_camera_image(PodonatorLib.mirror, cam1)
         img2 = PodonatorLib.get_camera_image(PodonatorLib.mirror, cam2)
@@ -130,10 +131,10 @@ def show_images(cam1, cam2, rotate_bool):
             #Concatenate the two streams in a single image
             img = np.concatenate((cv.rotate(up_img1, cv.ROTATE_90_CLOCKWISE), cv.rotate(up_img2, cv.ROTATE_90_COUNTERCLOCKWISE)), axis=1)
             #Image resolution to display
-            dim = (int(round(960 * PodonatorLib.image_ratio))*2, 960)
+            dim = (int(round(previewWindowLongSide * PodonatorLib.image_ratio))*2, previewWindowLongSide)
         else:
             img = np.concatenate((img1, img2), axis=0)
-            dim = (960, int(round(960 * PodonatorLib.image_ratio))*2)
+            dim = (previewWindowLongSide, int(round(previewWindowLongSide * PodonatorLib.image_ratio))*2)
         img = cv.resize(img, dim, interpolation=cv.INTER_AREA)
         #Convert to PyQt compatible colors
         img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
